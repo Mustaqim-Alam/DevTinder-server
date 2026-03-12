@@ -15,8 +15,8 @@ const connectDB = async () => {
     // NO OPTIONS AT ALL - just the connection string
     const conn = await mongoose.connect(MONGO_DB);
 
-    console.log("MongoDB Connected Successfully!");
-    console.log(`Database: ${conn.connection.name}`);
+    // console.log("MongoDB Connected Successfully!");
+    // console.log(`Database: ${conn.connection.name}`);
 
     return conn;
   } catch (error) {
@@ -27,23 +27,23 @@ const connectDB = async () => {
 };
 
 // Connection event handlers
-mongoose.connection.on("connected", () => {
-  console.log("Mongoose connected to MongoDB");
-});
+// mongoose.connection.on("connected", () => {
+//   console.log("Mongoose connected to MongoDB");
+// });
 
-mongoose.connection.on("error", (err) => {
-  console.error("Mongoose connection error:", err);
-});
+// mongoose.connection.on("error", (err) => {
+//   console.error("Mongoose connection error:", err);
+// });
 
-mongoose.connection.on("disconnected", () => {
-  console.log("Mongoose disconnected");
-});
+// mongoose.connection.on("disconnected", () => {
+//   console.log("Mongoose disconnected");
+// });
 
-// Handle application termination
-process.on("SIGINT", async () => {
-  await mongoose.connection.close();
-  console.log("Mongoose connection closed due to app termination");
-  process.exit(0);
-});
+// // Handle application termination
+// process.on("SIGINT", async () => {
+//   await mongoose.connection.close();
+//   console.log("Mongoose connection closed due to app termination");
+//   process.exit(0);
+// });
 
 module.exports = connectDB;

@@ -1,33 +1,62 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 
 const Schema = mongoose.Schema;
 
-const userSchema = new Schema({
-  firstName: {
-    type: String,
-    required: true,
+const userSchema = new Schema(
+  {
+    firstName: {
+      type: String,
+      required: true,
+      minlength: 4,
+    },
+    lastName: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      lowercase: true,
+      match: [/\S+@\S+\.\S+/, "is invalid"],
+    },
+    password: {
+      type: String,
+      required: true,
+      minlength: 6,
+      trim: true,
+      maxlength: 20,
+      match: [
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
+        "Password must be at least 6 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+      ],
+    },
+    gender: {
+      type: String,
+      enum: ["male", "female", "other"],
+    },
+    age: {
+      type: Number,
+      required: true,
+      min: 18,
+    },
+    photoUrl: {
+      type: String,
+      default:
+        "https://www.pngall.com/wp-content/uploads/5/Profile-PNG-High-Quality-Image.png",
+      validate(value) {
+        if (!validator.isURL(value)) {
+          throw new Error("Invalid photo URL: " + value);
+        }
+      },
+    },
   },
-  lastName: {
-    type: String,
-    required: true,
+  {
+    timestamps: true,
   },
-  email: {
-    type: String,
-    required: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-  gender: {
-    type: String,
-    enum: ["male", "female", "other"],
-  },
-  age: {
-    type: Number,
-    required: true,
-  },
-});
+);
 
 const User = mongoose.model("User", userSchema);
 
