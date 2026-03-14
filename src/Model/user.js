@@ -27,11 +27,7 @@ const userSchema = new Schema(
       required: true,
       minlength: 6,
       trim: true,
-      maxlength: 20,
-      match: [
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
-        "Password must be at least 6 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character",
-      ],
+     
     },
     gender: {
       type: String,
@@ -39,7 +35,7 @@ const userSchema = new Schema(
     },
     age: {
       type: Number,
-      required: true,
+      // required: true,
       min: 18,
     },
     photoUrl: {

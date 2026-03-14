@@ -1,26 +1,50 @@
 const User = require("../Model/user");
 const validator = require("validator");
+const bcrypt = require("bcrypt");
+const { signUpDataValidator } = require("../utils/validation");
 
 const signUpUser = async (req, res) => {
-  console.log(req.body);
-
-  const { firstName, lastName, email, password, gender, age } = req.body;
+  // const { firstName, lastName, email, password, gender, age } = req.body;
   try {
-    validator.isEmail(email) ||
-      res.status(400).json({ message: "Invalid email format" });
-    validator.isStrongPassword(password) ||
-      res.status(400).json({
-        message:
-          "Password must be at least 6 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character",
-      });
-    const user = new User(req.body);
+    signUpDataValidator(req);
+
+    const { firstName, lastName, email, password } = req.body;
+
+    const existingUser = await User.findOne({ email: req.body.email });
+    if (existingUser) {
+      return res.status(400).send("User with this email already exists");
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    console.log(passwordHash);
+
+    const user = new User({
+      firstName,
+      lastName,
+      email,
+      password: passwordHash,
+    });
     await user.save();
     res.status(201).json({ message: "User created successfully", user });
   } catch (error) {
-    console.error("Error creating user:", error.message);
-    res
-      .status(500)
-      .json({ message: "Error creating user", error: error.message });
+    res.status(500).send("ERROR: " + error.message);
+  }
+};
+
+const loginUser = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new Error("Invalid credentials" );
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new Error("Invalid password" );
+    }
+    res.status(200).json({ message: "Login successful", user });
+  } catch (error) {
+    res.status(500).json({ message: "Error logging in", error: error.message });
   }
 };
 
@@ -65,8 +89,8 @@ const updateUser = async (req, res) => {
       "gender",
       "age",
     ];
-    const isAllupdate = Object.keys(req.body).every((update) =>
-      allowedUpdates.includes(update),
+    const isAllupdate = Object.keys(req.body).every((key) =>
+      allowedUpdates.includes(key),
     );
 
     if (!isAllupdate) {
@@ -90,6 +114,6 @@ module.exports = {
   signUpUser,
   getAllUsers,
   deleteUser,
-  updateUser
+  updateUser,
+  loginUser,
 };
-

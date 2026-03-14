@@ -6,9 +6,11 @@ const {
   getAllUsers,
   deleteUser,
   updateUser,
+  loginUser
 } = require("../controller/user.controller");
 
 router.post("/", signUpUser);
+router.post("/login", loginUser);
 router.get("/", getAllUsers);
 router.delete("/:id", deleteUser);
 router.patch("/:id", updateUser);
